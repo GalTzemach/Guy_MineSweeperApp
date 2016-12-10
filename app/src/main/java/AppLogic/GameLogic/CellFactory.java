@@ -1,6 +1,5 @@
 package AppLogic.GameLogic;
-public final class CellFactory {
-	private static int numOfElements = 0;
+public final class CellFactory{
 	
 	public CellFactory() {
 		
@@ -13,20 +12,19 @@ public final class CellFactory {
 	 * @param type 	0 - for NumberCell, 1 - BombCell
 	 * @return
 	 */
-	public static Cell createNewCell(int row,int col,int type){
+	public static Cell createNewCell(int row,int col,int type) {
 		Cell newCell = null;
-		switch(type){
-			case 0:{
+		switch (type) {
+			case 0: {
 				newCell = new NumberCell(row, col);
 			}
 			break;
-			case 1:{
+			case 1: {
 				newCell = new BombCell(row, col);
 			}
 			break;
 		}
-		CellFactory.numOfElements++;
-		return newCell;
+        return newCell;
 	}
 	
 	/**
@@ -48,8 +46,5 @@ public final class CellFactory {
 		}
 		
 		return newCell;
-	}
-	public static int getNumberOfElements(){
-		return CellFactory.numOfElements;
 	}
 }
