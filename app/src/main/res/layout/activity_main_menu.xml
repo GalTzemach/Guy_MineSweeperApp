@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_main_menu"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    tools:context="fail.minesweeper.MainMenuActivity"
+    android:background="@drawable/minesweeper">
+
+    <TextView
+        android:text=""
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="#000000"
+        android:textSize="18dp"
+        android:textStyle="bold"
+        android:id="@+id/textView4"
+        android:layout_marginLeft="6dp"
+        android:layout_below="@+id/button2"
+        android:layout_toEndOf="@+id/textView3" />
+
+    <Button
+        android:text="Play!"
+        android:layout_width="250dp"
+        android:layout_height="70dp"
+        android:layout_marginTop="193dp"
+        android:id="@+id/button"
+        android:background="#ffffff"
+        android:textColor="#000000"
+        android:textSize="28dp"
+        android:layout_centerHorizontal="true" />
+
+    <Button
+        android:text="Select Level"
+        android:layout_width="250dp"
+        android:layout_height="70dp"
+        android:id="@+id/button2"
+        android:layout_marginTop="35dp"
+        android:background="#ffffff"
+        android:textColor="#000000"
+        android:textSize="25dp"
+        android:layout_below="@+id/button"
+        android:layout_alignStart="@+id/button" />
+
+    <TextView
+        android:text="Current Level:"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/textView3"
+        android:textColor="#000000"
+        android:textSize="18dp"
+        android:layout_alignBaseline="@+id/textView4"
+        android:layout_alignBottom="@+id/textView4"
+        android:layout_alignStart="@+id/button2" />
+
+    <Button
+        android:text="Leadership"
+        android:layout_width="250dp"
+        android:layout_height="70dp"
+        android:id="@+id/button3"
+        android:background="#ffffff"
+        android:textColor="#000000"
+        android:textSize="25dp"
+        android:layout_below="@+id/textView4"
+        android:layout_alignStart="@+id/textView3"
+        android:layout_marginTop="7dp" />
+
+</RelativeLayout>
