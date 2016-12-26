@@ -76,6 +76,9 @@ public class RecordActivity extends AppCompatActivity {
     }
 
     private String printRecord(int timeMs){
+        if(timeMs == 0){
+            return "No record";
+        }
         String record;
         String minStr;
         String secStr;
