@@ -165,8 +165,6 @@ public class GameController{
 	public boolean getIsFlaggedAtPosition(int pos){
 		return this.game.getIsFlaggedAtPosition(pos);
 	}
-
-
 	public int getNumberOfFlags(){
 		return this.numOfFlags;
 	}

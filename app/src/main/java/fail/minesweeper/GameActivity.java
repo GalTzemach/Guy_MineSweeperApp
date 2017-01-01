@@ -1,10 +1,16 @@
 package fail.minesweeper;
 
+import android.animation.Animator;
+import android.animation.AnimatorSet;
+import android.animation.ObjectAnimator;
+import android.animation.ValueAnimator;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.AdapterView;
@@ -121,13 +127,47 @@ public class GameActivity extends AppCompatActivity implements GameListener{
         Intent intent = new Intent(this, GameWonActivity.class);
         intent.putExtra("totalTime",gameCon.getTotalTime());
         intent.putExtra("level",gameCon.getLevel());
+        Log.v("guy","time:"+gameCon.getTotalTime());
         startActivityForResult(intent,GameConfig.REQUEST_CODE);
     }
     @Override
     public void gameOver(GameEvent e){
         threadTimer.terminate();
-        Intent intent = new Intent(this, GameOverActivity.class);
-        startActivityForResult(intent,GameConfig.REQUEST_CODE);
+        final AnimatorSet animatorSet = new AnimatorSet();
+        int count = gameMatrix.getChildCount();
+        ValueAnimator[] positionAnimatorArr = new ValueAnimator[count];
+
+        for (int i = 0; i < count; i++) {
+            final View childAt = gameMatrix.getChildAt(i);
+            positionAnimatorArr[i] = ValueAnimator.ofFloat(0, 500);
+            positionAnimatorArr[i].addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                @Override
+                public void onAnimationUpdate(ValueAnimator animation) {
+                    float value = (float) animation.getAnimatedValue();
+                    childAt.setY(childAt.getY()+value);
+                }
+            });
+            ObjectAnimator rotationAnimator = ObjectAnimator.ofFloat(childAt, "rotation", 0, 180f);
+            animatorSet.play(positionAnimatorArr[i]).with(rotationAnimator);
+        }
+        animatorSet.setDuration(2000);
+        animatorSet.addListener(new Animator.AnimatorListener() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+            }
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                Intent intent = new Intent(GameActivity.this, GameOverActivity.class);
+                startActivityForResult(intent,GameConfig.REQUEST_CODE);
+            }
+            @Override
+            public void onAnimationCancel(Animator animation) {
+            }
+            @Override
+            public void onAnimationRepeat(Animator animation) {
+            }
+        });
+        animatorSet.start();
     }
 
     @Override

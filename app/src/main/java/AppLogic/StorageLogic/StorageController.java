@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 
 import java.util.ArrayList;
 
@@ -29,6 +30,7 @@ public class StorageController {
         values.put(StorageConfig.COLUMN_TIME_MS, timeMs);
         values.put(StorageConfig.COLUMN_LEVEL, level);
         long newRowId = dbForWrite.insert(StorageConfig.TABLE_NAME, null, values);
+        Log.v("Guy","Insert new record");
     }
     public ArrayList<GameRecord> getRecords(int level){
         ArrayList<GameRecord> gameRecordsArr = new ArrayList<>();

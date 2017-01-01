@@ -3,18 +3,23 @@ package fail.minesweeper;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import AppLogic.GameLogic.GameConfig;
+import AppLogic.RecordsLogic.GameRecord;
+import AppLogic.RecordsLogic.RecordController;
 
-public class GameWonActivity extends AppCompatActivity {
+public  class GameWonActivity extends AppCompatActivity {
+    private RecordController recCon;
+    private String playerName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,7 +34,12 @@ public class GameWonActivity extends AppCompatActivity {
         title.setText("Game Won!");
         title.setGravity(Gravity.CENTER);
         myMainLayout.addView(title);
+
+        recCon = new RecordController(this);
         Button tryAgainButton = new Button(this);
+        final EditText nameField = new EditText(this);
+        Button setButton = new Button(this);
+
         tryAgainButton.setText("New Game?");
         tryAgainButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -39,8 +49,25 @@ public class GameWonActivity extends AppCompatActivity {
                 finish();
             }
         });
+        setButton.setText("BOOM");
+
+        setButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                playerName = nameField.getText().toString();
+                Log.v("orel", "Try to set new Record with the name: "+playerName);
+                checkRecordInStorage();
+                finish();
+            }
+        });
+
+
         myMainLayout.addView(tryAgainButton);
-        checkRecord();
+        myMainLayout.addView(nameField);
+        myMainLayout.addView(setButton);
+
+        //checkRecord();
+        //checkRecordInStorage();
 
     }
 
@@ -48,7 +75,7 @@ public class GameWonActivity extends AppCompatActivity {
         int level  = getIntent().getIntExtra("level" , 0); // should be -1
         SharedPreferences gameSettings = getSharedPreferences(GameConfig.PREFERENCE_NAME,0);
         int currentRecord = gameSettings.getInt(GameConfig.LEVEL_RECORDS[level],0);
-        int newRecord = getIntent().getIntExtra("totalTime" , 0);
+        int newRecord = getIntent().getIntExtra("totalTime",20);
         Log.v("orel", "GameWonActivity check record : "+ currentRecord +" new: "+ newRecord+ "level:"+ GameConfig.LEVEL_RECORDS[level]);
         if(currentRecord > 0) {
             if (currentRecord > newRecord)
@@ -64,4 +91,22 @@ public class GameWonActivity extends AppCompatActivity {
         Log.v("orel", "set new record : "+ newRecord+ " level:"+ GameConfig.LEVEL_RECORDS[level]);
         editor.commit();
     }
+
+    public void checkRecordInStorage(){
+        int level  = getIntent().getIntExtra("level" , 0); // should be -1
+        int newRecord = getIntent().getIntExtra("totalTime" , 0);
+        Log.v("orel", "GameWonActivity check record : "+ newRecord+ "level:"+ GameConfig.LEVEL_RECORDS[level]);
+        //if(currentRecord > 0) {
+        //    if (currentRecord > newRecord)
+        //        setRecord(newRecord , level);
+        //    Log.v("orel", "No Change currentRecord < newRecord"+ " level: "+ GameConfig.LEVEL_RECORDS[level]);
+        //}else setRecord(newRecord , level);
+        setRecordToStorage(newRecord , level);
+    }
+
+    public void setRecordToStorage(int newRecord , int level){
+        Log.v("orel", "send new Record to the Record Controller ");
+        recCon.addRecord(new GameRecord(0 , newRecord , level , playerName));
+    }
+
 }

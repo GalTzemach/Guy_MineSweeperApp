@@ -265,4 +265,12 @@ public class GameBoard {
 	public void addFlagsListener(FlagsListener fl) {
 		this.flagsListener = fl;
 	}
+	public void revealAll() {
+		for(Cell[] row: this.getBoard()){
+			for(Cell c: row){
+				c.setHidden(false);
+			}
+		}
+	}
+
 }
