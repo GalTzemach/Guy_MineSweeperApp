@@ -37,7 +37,7 @@ public class RecordActivity2 extends AppCompatActivity {
         levelSelectLayout.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,LinearLayout.LayoutParams.WRAP_CONTENT));
 
         TextView title = new TextView(this);
-        title.setText("LEADERSHIP");
+        title.setText("LEADERBOARD");
         title.setTextColor(Color.parseColor("#000000"));
         title.setTextSize(48);
         title.setGravity(Gravity.CENTER);
@@ -66,7 +66,7 @@ public class RecordActivity2 extends AppCompatActivity {
         beginnerBut.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.v("orel","Enter to print table by pressing BEGINNER button");
+                table.removeAllViews();
                 printTable( table , GameConfig.BEGINNER_LEVEL);
             }
         });
@@ -74,7 +74,7 @@ public class RecordActivity2 extends AppCompatActivity {
         advancedBut.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.v("orel","Enter to print table by pressing ADVANCED button");
+                table.removeAllViews();
                 printTable( table , GameConfig.ADVANCED_LEVEL);
             }
         });
@@ -82,7 +82,7 @@ public class RecordActivity2 extends AppCompatActivity {
         expertBut.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.v("orel","Enter to print table by pressing EXPERT button");
+                table.removeAllViews();
                 printTable( table , GameConfig.EXPERT_LEVEL);
             }
         });

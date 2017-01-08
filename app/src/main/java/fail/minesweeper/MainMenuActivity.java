@@ -46,7 +46,7 @@ public class MainMenuActivity extends AppCompatActivity {
     }
 
     private void goToRecordActivity() {
-        Intent intent = new Intent(this, RecordActivity2.class);
+        Intent intent = new Intent(this, RecordActivity.class);
         startActivity(intent);
     }
 

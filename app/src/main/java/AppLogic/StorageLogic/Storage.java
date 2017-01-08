@@ -9,7 +9,7 @@ import android.database.sqlite.SQLiteOpenHelper;
  */
 
 public class Storage extends SQLiteOpenHelper{
-    public static final int DATABASE_VERSION = 1;
+    public static final int DATABASE_VERSION = 2;
     public static final String DATABASE_NAME = "minesweeper.db";
 
     public Storage(Context context) {
@@ -32,7 +32,9 @@ public class Storage extends SQLiteOpenHelper{
                     StorageConfig.COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
                     StorageConfig.COLUMN_PERSON_NAME + " TEXT," +
                     StorageConfig.COLUMN_TIME_MS + " INTEGER," +
-                    StorageConfig.COLUMN_LEVEL + " INTEGER )";
+                    StorageConfig.COLUMN_LEVEL + " INTEGER," +
+                    StorageConfig.COLUMN_LONG + " DOUBLE," +
+                    StorageConfig.COLUMN_LATI +" DOUBLE)";
 
     private static final String SQL_DELETE_ENTRIES =
             "DROP TABLE IF EXISTS " + StorageConfig.TABLE_NAME;

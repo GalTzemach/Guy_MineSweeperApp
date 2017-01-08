@@ -58,7 +58,7 @@
         android:layout_alignStart="@+id/button2" />
 
     <Button
-        android:text="Leadership"
+        android:text="LEADERBOARD"
         android:layout_width="250dp"
         android:layout_height="70dp"
         android:id="@+id/button3"

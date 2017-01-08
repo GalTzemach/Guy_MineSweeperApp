@@ -1,6 +1,11 @@
 package AppLogic.RecordsLogic;
 
 import android.content.Context;
+import android.content.pm.PackageManager;
+import android.location.Location;
+import android.location.LocationManager;
+import android.support.v4.app.ActivityCompat;
+
 import java.util.ArrayList;
 import AppLogic.GameLogic.GameConfig;
 import AppLogic.StorageLogic.StorageController;
@@ -14,7 +19,11 @@ public  class RecordController{
 	}
 
 	public void addRecord(GameRecord newGameRecord){
-		stController.addNewRecord(newGameRecord.getName(),newGameRecord.getRecordTime(),newGameRecord.getLevel());
+		stController.addNewRecord(newGameRecord.getName(),
+				newGameRecord.getRecordTime(),
+				newGameRecord.getLevel(),
+				newGameRecord.getLongitude(),
+				newGameRecord.getLatitude());
 	}
 
 

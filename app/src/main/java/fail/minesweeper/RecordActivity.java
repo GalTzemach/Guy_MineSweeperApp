@@ -1,96 +1,126 @@
 package fail.minesweeper;
 
-import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Gravity;
+import android.view.View;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import AppLogic.GameLogic.GameConfig;
+import AppLogic.RecordsLogic.RecordController;
 
 public class RecordActivity extends AppCompatActivity {
+    public static final int MAP_FRAGMENT = 1;
+    public static final int TABLE_FRAGMENT = 0;
+
+    private RecordController recCon;
+    private RecordTableFragment tableViewFragment;
+    private RecordMapFragment   mapFragment;
+    private FragmentTransaction ft;
+    private LinearLayout myMainLayout;
+    private Button switchView;
+    private int currentFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_record);
+        recCon = new RecordController(this);
 
-        SharedPreferences gameSettings = getSharedPreferences(GameConfig.PREFERENCE_NAME,0);
-        LinearLayout myMainLayout = new LinearLayout(this);
+        this.myMainLayout = new LinearLayout(this);
         myMainLayout.setOrientation(LinearLayout.VERTICAL);
-        this.addContentView(myMainLayout,new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,LinearLayout.LayoutParams.MATCH_PARENT));
-        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        layoutParams.setMargins(50 , 30 , 30 ,30);
+        myMainLayout.setId(R.id.recordActivityLL);
 
+        this.addContentView(myMainLayout,new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,LinearLayout.LayoutParams.MATCH_PARENT));
+        LinearLayout levelSelectLayout = new LinearLayout(this);
+        levelSelectLayout.setOrientation(LinearLayout.HORIZONTAL);
+        levelSelectLayout.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,LinearLayout.LayoutParams.WRAP_CONTENT));
 
         TextView title = new TextView(this);
-        title.setText("LEADERSHIP");
+        title.setText("LEADERBOARD");
         title.setTextColor(Color.parseColor("#000000"));
         title.setTextSize(48);
         title.setGravity(Gravity.CENTER);
-        myMainLayout.addView(title );
+        myMainLayout.addView(title);
 
+        Button beginnerBut = new Button(this);
+        beginnerBut.setText(GameConfig.LEVEL_LABELS[0]);
+        beginnerBut.setTextColor(Color.parseColor("#000000"));
+        beginnerBut.setBackgroundColor(Color.WHITE);
+        levelSelectLayout.addView(beginnerBut);
 
-        TextView beginner = new TextView(this);
-        beginner.setText(GameConfig.LEVEL_RECORDS[0]);
-        beginner.setTextColor(Color.parseColor("#000000"));
-        beginner.setTextSize(28);
+        Button advancedBut = new Button(this);
+        advancedBut.setText(GameConfig.LEVEL_LABELS[1]);
+        advancedBut.setTextColor(Color.parseColor("#000000"));
+        advancedBut.setBackgroundColor(Color.WHITE);
+        levelSelectLayout.addView(advancedBut);
 
-        TextView beginnerRecord = new TextView(this);
-        beginnerRecord.setTextColor(Color.parseColor("#000000"));
-        beginnerRecord.setText(printRecord(gameSettings.getInt(GameConfig.LEVEL_RECORDS[0],0)));
-        Log.v("record" , "beginner Record: "+Integer.toString(gameSettings.getInt(GameConfig.LEVEL_RECORDS[0],0)));
-        beginnerRecord.setTextSize(28);
-        myMainLayout.addView(beginner , layoutParams);
-        myMainLayout.addView(beginnerRecord , layoutParams);
+        Button expertBut = new Button(this);
+        expertBut.setText(GameConfig.LEVEL_LABELS[2]);
+        expertBut.setTextColor(Color.parseColor("#000000"));
+        expertBut.setBackgroundColor(Color.WHITE);
+        levelSelectLayout.addView(expertBut);
 
+        switchView = new Button(this);
+        switchView.setText(R.string.MapView);
+        switchView.setTextColor(Color.parseColor("#a8342a"));
+        switchView.setBackgroundColor(Color.WHITE);
+        levelSelectLayout.addView(switchView);
 
-        TextView advenced = new TextView(this);
-        advenced.setText(GameConfig.LEVEL_RECORDS[1]);
-        advenced.setTextColor(Color.parseColor("#000000"));
-        advenced.setTextSize(28);
+        levelSelectLayout.setGravity(Gravity.CENTER);
+        myMainLayout.addView(levelSelectLayout);
 
-        TextView advancedRecord = new TextView(this);
-        advancedRecord.setTextColor(Color.parseColor("#000000"));
-        advancedRecord.setText(printRecord(gameSettings.getInt(GameConfig.LEVEL_RECORDS[1],0)));
-        Log.v("record" , "advanced Record: "+Integer.toString(gameSettings.getInt(GameConfig.LEVEL_RECORDS[1],0)));
-        advancedRecord.setTextSize(28);
-        myMainLayout.addView(advenced, layoutParams);
-        myMainLayout.addView(advancedRecord, layoutParams);
+        this.tableViewFragment = RecordTableFragment.newInstance(GameConfig.BEGINNER_LEVEL);
+        this.tableViewFragment.setRecordController(this.recCon);
+        this.mapFragment = RecordMapFragment.newInstance(GameConfig.BEGINNER_LEVEL);
+        this.mapFragment.setRecordController(this.recCon);
 
-        TextView expert = new TextView(this);
-        expert.setText(GameConfig.LEVEL_RECORDS[2]);
-        expert.setTextColor(Color.parseColor("#000000"));
-        expert.setTextSize(28);
+        this.ft = getSupportFragmentManager().beginTransaction();
+        ft.add(myMainLayout.getId(), tableViewFragment).commit();
+        this.currentFragment = TABLE_FRAGMENT;
 
-        TextView expertRecord = new TextView(this);
-        expertRecord.setTextColor(Color.parseColor("#000000"));
-        expertRecord.setText(printRecord(gameSettings.getInt(GameConfig.LEVEL_RECORDS[2],0)));
-        Log.v("record" , "expert Record: "+Integer.toString(gameSettings.getInt(GameConfig.LEVEL_RECORDS[2],0)));
-        expertRecord.setTextSize(28);
-        myMainLayout.addView(expert, layoutParams);
-        myMainLayout.addView(expertRecord, layoutParams);
-    }
+        beginnerBut.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                tableViewFragment.updateTable(GameConfig.BEGINNER_LEVEL);
+            }
+        });
+        advancedBut.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                tableViewFragment.updateTable(GameConfig.ADVANCED_LEVEL);
+            }
+        });
+        expertBut.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                tableViewFragment.updateTable(GameConfig.EXPERT_LEVEL);
+            }
+        });
 
-    private String printRecord(int timeMs){
-        if(timeMs == 0){
-            return "No record";
-        }
-        String record;
-        String minStr;
-        String secStr;
-        int totalSec = timeMs/1000;
-        int min = totalSec/60;
-        int sec = totalSec%60;
-        if(min<10)  { minStr = "0"+Integer.toString(min);}
-        else        { minStr = Integer.toString(min);    }
-        if(sec<10)  { secStr = "0"+Integer.toString(sec);}
-        else        { secStr = Integer.toString(sec);    }
-        record =(""+minStr+":"+secStr+"");
+        switchView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                switch(currentFragment){
+                    case TABLE_FRAGMENT:{
+                        switchView.setText("Table View");
+                        ft = getSupportFragmentManager().beginTransaction();
+                        ft.replace(myMainLayout.getId(), mapFragment).commit();
+                        currentFragment = MAP_FRAGMENT;
+                    }break;
+                    case MAP_FRAGMENT:{
+                        switchView.setText("Map View");
+                        ft = getSupportFragmentManager().beginTransaction();
+                        ft.replace(myMainLayout.getId(), tableViewFragment).commit();
+                        currentFragment = TABLE_FRAGMENT;
+                    }break;
+                }
 
-        return record;
+            }
+        });
     }
 }
