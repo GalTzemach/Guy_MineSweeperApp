@@ -124,15 +124,12 @@ public class RecordTableFragment extends Fragment {
     }
 
     private void printTable(TableLayout table , int level ){
-        Log.v("orel","Enter to print Table");
         ArrayList<GameRecord> recordsArray = recCon.getRecordsArray(level);
-        Log.v("orel",""+recordsArray.size());
         for (int i=1 ; i <= recordsArray.size() ; i++)
             printRow(table , i , recordsArray.get(i-1));
     }
 
     private void printRow(TableLayout table , int rank , GameRecord record){
-        Log.v("orel","Printing row: Rank#"+rank+" Name:"+record.getName()+" Time:"+record.getRecordTime());
         TableRow tr = new TableRow(this.parent);
         TextView rankIndex = new TextView(this.parent);
         rankIndex.setTextColor(Color.parseColor("#000000"));

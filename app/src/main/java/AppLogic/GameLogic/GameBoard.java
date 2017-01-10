@@ -1,4 +1,6 @@
 package AppLogic.GameLogic;
+import android.util.Log;
+
 import java.util.ArrayList;
 import java.util.concurrent.ThreadLocalRandom;
 import AppLogic.GameExceptions.*;
@@ -72,16 +74,20 @@ public class GameBoard {
 	 *	@see BombCell
 	 *	@see NumberCell
 	 */
-	public void throwSomeBombs(){
-		int x,y;
+	public void throwSomeBombs(int numberOfBombs){
+		// hidden - only while playing, at the time the game is adding bombs, we cover all the cells
+		// around the new bomb. hence we need to increase the amount of numberOfHiddenCells.
+		int x, y, hidden = 0;
 		for(int i=0; i<numberOfBombs; i++){
 			do{
 				y = ThreadLocalRandom.current().nextInt(0, cols);
 				x = ThreadLocalRandom.current().nextInt(0, rows);
 			}while(board[x][y] instanceof BombCell);
 			board[x][y] = (Cell)CellFactory.changeCell(board[x][y], true);
-			((BombCell) board[x][y]).updateNeighbors();
+			hidden += ((BombCell) board[x][y]).updateNeighbors();
 		}
+		Log.v("guy","current numberOfHiddenCells: "+this.numberOfHiddenCells+" added: "+hidden);
+		this.numberOfHiddenCells += hidden;
 	}
 	/**
 	 * Reveal a Cell change the Cell.isHidden attribute to true </br>
@@ -146,7 +152,7 @@ public class GameBoard {
 			}
 		}
 		this.createCellsNeighbors();
-		this.throwSomeBombs();
+		this.throwSomeBombs(this.getNumberOfBombs());
 		this.setNumberOfFlags(this.getNumberOfBombs());
 		this.setNumberOfHiddenCells(this.getRows()*this.getRows());
 	}
@@ -273,4 +279,12 @@ public class GameBoard {
 		}
 	}
 
+	public void addBombWhilePlaying() {
+		this.throwSomeBombs(1);
+		this.numberOfBombs++;
+		this.numberOfFlags++;
+        this.numberOfHiddenCells++;  // for the bomb
+		flagsListener.flagUnmarked();
+        checkGame();
+	}
 }

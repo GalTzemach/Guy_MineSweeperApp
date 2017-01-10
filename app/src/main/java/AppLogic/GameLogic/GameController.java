@@ -49,7 +49,7 @@ public class GameController{
 		}
 		if(game != null){
 			game.initBoard();
-			game.throwSomeBombs();
+			game.throwSomeBombs(game.getNumberOfBombs());
 		}
 	}
 	/**
@@ -137,6 +137,9 @@ public class GameController{
 		for(GameListener gl : this.gameListenerList){
 			gl.winGame(e);
 		}
+	}
+	public void addBombWhilePlaying(){
+		game.addBombWhilePlaying();
 	}
 	/**
 	 * Trigger {@link GameListener#gameOver(GameEvent)} to all listeners

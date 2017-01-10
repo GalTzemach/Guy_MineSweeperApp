@@ -60,7 +60,6 @@ public  class GameWonActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 playerName = nameField.getText().toString();
-                Log.v("orel", "Try to set new Record with the name: "+playerName);
                 checkRecordInStorage();
                 finish();
             }
@@ -81,11 +80,9 @@ public  class GameWonActivity extends AppCompatActivity {
         SharedPreferences gameSettings = getSharedPreferences(GameConfig.PREFERENCE_NAME,0);
         int currentRecord = gameSettings.getInt(GameConfig.LEVEL_RECORDS[level],0);
         int newRecord = getIntent().getIntExtra("totalTime",20);
-        Log.v("orel", "GameWonActivity check record : "+ currentRecord +" new: "+ newRecord+ "level:"+ GameConfig.LEVEL_RECORDS[level]);
         if(currentRecord > 0) {
             if (currentRecord > newRecord)
                 setRecord(newRecord , level);
-            Log.v("orel", "No Change currentRecord < newRecord"+ " level: "+ GameConfig.LEVEL_RECORDS[level]);
         }else setRecord(newRecord , level);
     }
 
@@ -93,24 +90,16 @@ public  class GameWonActivity extends AppCompatActivity {
         SharedPreferences gameSettings = getSharedPreferences(GameConfig.PREFERENCE_NAME,0);
         SharedPreferences.Editor editor = gameSettings.edit();
         editor.putInt(GameConfig.LEVEL_RECORDS[level],newRecord);
-        Log.v("orel", "set new record : "+ newRecord+ " level:"+ GameConfig.LEVEL_RECORDS[level]);
         editor.commit();
     }
 
     public void checkRecordInStorage(){
         int level  = getIntent().getIntExtra("level" , 0); // should be -1
         int newRecord = getIntent().getIntExtra("totalTime" , 0);
-        Log.v("orel", "GameWonActivity check record : "+ newRecord+ "level:"+ GameConfig.LEVEL_RECORDS[level]);
-        //if(currentRecord > 0) {
-        //    if (currentRecord > newRecord)
-        //        setRecord(newRecord , level);
-        //    Log.v("orel", "No Change currentRecord < newRecord"+ " level: "+ GameConfig.LEVEL_RECORDS[level]);
-        //}else setRecord(newRecord , level);
         setRecordToStorage(newRecord , level);
     }
 
     public void setRecordToStorage(int newRecord , int level){
-        Log.v("orel", "send new Record to the Record Controller ");
         LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) !=
                 PackageManager.PERMISSION_GRANTED &&

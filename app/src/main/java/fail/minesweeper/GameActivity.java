@@ -4,10 +4,14 @@ import android.animation.Animator;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.Color;
+import android.os.IBinder;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -17,19 +21,25 @@ import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import AppLogic.GameExceptions.InvalidCellException;
 import AppLogic.GameExceptions.NoMoreFlagsException;
+import AppLogic.GameLogic.AccelerometerListener;
 import AppLogic.GameLogic.GameConfig;
 import AppLogic.GameLogic.GameController;
 import AppLogic.GameLogic.GameEvent;
 import AppLogic.GameLogic.GameListener;
 
-public class GameActivity extends AppCompatActivity implements GameListener{
+public class GameActivity extends AppCompatActivity implements GameListener, AccelerometerListener{
     private FlagsLeftTextView flagsText;
     private GameController gameCon;
     private GridView gameMatrix;
     private ThreadTimer threadTimer;
     private TimerTextView timerTextView;
+    private ServiceConnection mConnection;
+    private boolean serviceConnected = false;
+    private boolean isWarned = false;
     private int level;
 
     @Override
@@ -93,6 +103,28 @@ public class GameActivity extends AppCompatActivity implements GameListener{
         myMainLayout.addView(timerTextView);
         threadTimer = new ThreadTimer(timerTextView);
         threadTimer.start();
+
+        mConnection = new ServiceConnection() {
+            @Override
+            public void onServiceConnected(ComponentName name, IBinder service) {
+                serviceConnected = true;
+                ((AccelerometerService.SensorServiceBinder)service).getService().setListener(GameActivity.this);
+            }
+
+            @Override
+            public void onServiceDisconnected(ComponentName name) {
+                serviceConnected = false;
+            }
+        };
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        if(!serviceConnected) {
+            Intent intent = new Intent(this, AccelerometerService.class);
+            bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+        }
     }
 
     @Override
@@ -124,15 +156,20 @@ public class GameActivity extends AppCompatActivity implements GameListener{
     @Override
     public void winGame(GameEvent e) {
         threadTimer.terminate();
+        unbindService(mConnection);
+        serviceConnected = false;
         Intent intent = new Intent(this, GameWonActivity.class);
         intent.putExtra("totalTime",gameCon.getTotalTime());
         intent.putExtra("level",gameCon.getLevel());
         Log.v("guy","time:"+gameCon.getTotalTime());
         startActivityForResult(intent,GameConfig.REQUEST_CODE);
+
     }
     @Override
     public void gameOver(GameEvent e){
         threadTimer.terminate();
+        unbindService(mConnection);
+        serviceConnected = false;
         final AnimatorSet animatorSet = new AnimatorSet();
         int count = gameMatrix.getChildCount();
         ValueAnimator[] positionAnimatorArr = new ValueAnimator[count];
@@ -175,5 +212,30 @@ public class GameActivity extends AppCompatActivity implements GameListener{
         super.onResume();
         SharedPreferences gameSettings = getSharedPreferences(GameConfig.PREFERENCE_NAME,0);
         level = gameSettings.getInt(GameConfig.LEVEL_PREF,GameConfig.BEGINNER_LEVEL);
+        if(!serviceConnected) {
+            Intent intent = new Intent(this, AccelerometerService.class);
+            bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+        }
+    }
+
+    @Override
+    public void accelerometerChanged() {
+        if(!isWarned) {
+            Toast.makeText(this, "Wooops, you are moving your phone too much!", Toast.LENGTH_SHORT).show();
+            isWarned = true;
+        }else{
+            Toast.makeText(this, "Start adding bombs!", Toast.LENGTH_SHORT).show();
+            gameCon.addBombWhilePlaying();
+            ((GameAdapter)gameMatrix.getAdapter()).notifyDataSetChanged();
+        }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if(serviceConnected){
+            unbindService(mConnection);
+            serviceConnected = false;
+        }
     }
 }

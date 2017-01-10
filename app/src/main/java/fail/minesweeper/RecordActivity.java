@@ -4,6 +4,7 @@ import android.graphics.Color;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
@@ -86,19 +87,28 @@ public class RecordActivity extends AppCompatActivity {
         beginnerBut.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                tableViewFragment.updateTable(GameConfig.BEGINNER_LEVEL);
+                if(currentFragment == TABLE_FRAGMENT)
+                    tableViewFragment.updateTable(GameConfig.BEGINNER_LEVEL);
+                else
+                    mapFragment.updateMap(GameConfig.BEGINNER_LEVEL);
             }
         });
         advancedBut.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                tableViewFragment.updateTable(GameConfig.ADVANCED_LEVEL);
+                if(currentFragment == TABLE_FRAGMENT)
+                    tableViewFragment.updateTable(GameConfig.ADVANCED_LEVEL);
+                else
+                    mapFragment.updateMap(GameConfig.ADVANCED_LEVEL);
             }
         });
         expertBut.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                tableViewFragment.updateTable(GameConfig.EXPERT_LEVEL);
+                if(currentFragment == TABLE_FRAGMENT)
+                    tableViewFragment.updateTable(GameConfig.EXPERT_LEVEL);
+                else
+                    mapFragment.updateMap(GameConfig.EXPERT_LEVEL);
             }
         });
 

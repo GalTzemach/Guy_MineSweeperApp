@@ -67,6 +67,9 @@ public class GameRecord {
 
 		return record;
 	}
-		
+
+	public String toString(){
+		return "GameRecord: user:"+this.getName()+" Level:"+this.getLevel()+" time:"+ this.recordTimeToString();
+	}
 
 }

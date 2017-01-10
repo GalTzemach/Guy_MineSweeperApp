@@ -2,15 +2,19 @@ package fail.minesweeper;
 
 import android.app.Activity;
 
+import android.app.Dialog;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -29,6 +33,7 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 
 import AppLogic.GameLogic.GameConfig;
@@ -45,11 +50,14 @@ import AppLogic.RecordsLogic.RecordController;
  * create an instance of this fragment.
  */
 public class RecordMapFragment extends Fragment implements OnMapReadyCallback {
+    private static final String LEVEL_SELECTOR = "level";
     private RecordController recCon;
     private GoogleMap mMap;
     private MapView mMapView;
     private View mView;
-    private Map<Marker, GameRecord> gameRecordMap;
+    private HashMap<Marker, GameRecord> gameRecordMap;
+    private RecordMapDialogFragment recordDialog;
+    private int level;
 
 
     private OnFragmentInteractionListener mListener;
@@ -62,7 +70,7 @@ public class RecordMapFragment extends Fragment implements OnMapReadyCallback {
     public static RecordMapFragment newInstance(int currentLevel) {
         RecordMapFragment fragment = new RecordMapFragment();
         Bundle args = new Bundle();
-        args.putInt("level", currentLevel);
+        args.putInt(LEVEL_SELECTOR, currentLevel);
         fragment.setArguments(args);
         return fragment;
     }
@@ -70,6 +78,8 @@ public class RecordMapFragment extends Fragment implements OnMapReadyCallback {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        this.level = getArguments().getInt(LEVEL_SELECTOR);
+        this.gameRecordMap = new HashMap<>();
     }
 
     @Override
@@ -112,25 +122,40 @@ public class RecordMapFragment extends Fragment implements OnMapReadyCallback {
         MapsInitializer.initialize(getContext());
         mMap = googleMap;
         mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+        mMap.clear();
 
         mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(Marker marker) {
+                GameRecord gr = gameRecordMap.get(marker);
+                Log.v("guy",gr.toString());
+                recordDialog.setGameRecord(gr);
+                FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
+                ft.add(recordDialog,"guy");
+                ft.commit();
                 return false;
             }
         });
 
-
-        ArrayList<GameRecord> arr = recCon.getRecordsArray(GameConfig.BEGINNER_LEVEL);
+        this.recordDialog = RecordMapDialogFragment.newInstance();
+        ArrayList<GameRecord> arr = recCon.getRecordsArray(this.level);
         CameraPosition cPos = null;
-        for(GameRecord gr : arr){
-            double longitude = gr.getLongitude();
-            double latitude  = gr.getLatitude();
-            LatLng pos = new LatLng(latitude,longitude);
-            cPos = CameraPosition.builder().target(pos).zoom(15).build();
-            mMap.addMarker(new MarkerOptions().position(pos).title(gr.getName()).snippet("Score: "+gr.recordTimeToString()));
+        if(arr!=null && arr.size() > 0) {
+            for (GameRecord gr : arr) {
+                double longitude = gr.getLongitude();
+                double latitude = gr.getLatitude();
+                LatLng pos = new LatLng(latitude, longitude);
+                cPos = CameraPosition.builder().target(pos).zoom(15).build();
+                Marker m = mMap.addMarker(new MarkerOptions().position(pos).title(gr.getName()));
+                gameRecordMap.put(m, gr);
+            }
+            mMap.moveCamera(CameraUpdateFactory.newCameraPosition(cPos));
         }
-        mMap.moveCamera(CameraUpdateFactory.newCameraPosition(cPos));
+    }
+
+    public void updateMap(int level) {
+        this.setLevel(level);
+        this.onMapReady(this.mMap);
     }
 
     /**
@@ -146,5 +171,9 @@ public class RecordMapFragment extends Fragment implements OnMapReadyCallback {
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
+    }
+
+    public void setLevel(int level) {
+        this.level = level;
     }
 }
